@@ -434,6 +434,13 @@ async function login(jid, password) {
         xmpp.send(presenceStanza)
         console.log(`👯 Te has unido a la sala ${roomJid}`)
       }
+      // Manejar mensajes 1 a 1
+      else if (stanza.is('message') && stanza.attrs.type === 'chat' && stanza.getChild('body')) {
+        const from = stanza.attrs.from
+        const message = stanza.getChildText('body')
+
+
+
 
 
 menu()

@@ -404,5 +404,19 @@ async function login(jid, password) {
           })
         })
         break
+      case '8':
+        // Cerrar sesion
+        await xmpp.send(xml('presence', {type: 'unavailable'}))
+        await xmpp.stop()
+        cleanContacts
+        break
+      default:
+        console.log('❌ Opción no válida. Por favor, elige una opción válida.')
+        secondMenu()
+    }
+  }
+
+
+
 
 menu()

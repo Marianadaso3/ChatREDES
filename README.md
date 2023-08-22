@@ -41,20 +41,22 @@ npm run dev
 
 ```javascript
 function menu() {
-  console.log('1) Registrar una nueva cuenta en el servidor')
-  console.log('2) Iniciar sesión con una cuenta')
-  console.log('3) Eliminar la cuenta del servidor')
-  console.log('4) Salir del programa')
-  rl.question('\nElige una opción: ', (answer) => {
-    handleMenuOption(answer)
-  })
+    console.log("\n=================================== Bienvenido al AlumChat ===================================\n");
+    console.log("Por favor, seleccione una opción:\n");
+    console.log("[1] Registrar una cuenta nueva en el servidor");
+    console.log("[2] Iniciar sesión con una cuenta existente");
+    console.log("[3] Eliminar la cuenta del servidor");
+    console.log("[4] Salir del programa");
+    lectorLinea.question("\nIngrese el número de la opción que desea ejecutar: ", (answer) => {
+      handleMenuOption(answer);
+    });
 }
 ```
 
 ### Status change
 
 ```javascript
-const cambiarEstadoUsuario = (xmpp, show, status) => {
+const changeState = (xmpp, status, showMessage) => {
   // Código para cambiar el estado del usuario
 }
 ```
@@ -74,7 +76,7 @@ Parameters:
 ### Read and Send Files
 
 ```javascript
-const leerArchivo = async (xmpp,path,toJid) => { ... }
+const reedFile = async (xmpp,path,toJid) => { ... }
 ```
 
 Parameters:
@@ -85,7 +87,7 @@ Parameters:
 ### Menu Options
 
 ```javascript
-function handleMenuOption(option) { ... }
+function casesMenu(option) { ... }
 ```
 ### User Registration
 
@@ -95,8 +97,8 @@ async function register(username, password) { ... }
 ### Creation and Joining Rooms
 
 ```javascript
-const crearRoom = async (xmpp, roomName) => { ... }
-const unirseRoom = async (xmpp, roomName) => { ... }
+const creatRoom = async (xmpp, roomName) => { ... }
+const joinRoom = async (xmpp, roomName) => { ... }
 ```
 Parameters:
 - xmpp: XMPP client connected to the server

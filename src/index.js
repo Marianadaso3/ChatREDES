@@ -587,6 +587,52 @@ async function login(jid, password) {
 
 }
 
+// Funcion para eliminar una cuenta del servidor
+async function deleteAccount(jid, password) {
+
+  // Nos conectamos al servidor 
+  const xmpp = client({
+    service: 'xmpp://alumchat.xyz:5222',
+    domain: 'alumchat.xyz',
+    username: jid, 
+    password: password,
+    terminal: true,
+  })
+
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
+  
+  xmpp.on('stanza', async (stanza) => {
+    // si nos llega la estanza del result es que se ha eliminado la cuenta
+    if (stanza.is('iq') && stanza.attrs.type === 'result') {
+      console.log('🗸', 'Successfully deleted account')
+      
+    }
+  })
+
+  xmpp.on('error', (err) => {
+    console.error('❌', err.toString())
+  })
+
+  xmpp.on('online', async () => {
+    console.log('▶', 'online as', xmpp.jid.toString(), '\n')
+    // creamos la estanza para eliminar la cuenta
+    const deleteStanza = xml(
+      'iq',
+      { type: 'set', id: 'delete1' },
+      xml('query', { xmlns: 'jabber:iq:register' }, xml('remove'))
+    )
+    try{
+
+      await xmpp.send(deleteStanza)
+    }
+    catch(err){
+      console.log(err)
+    }finally{
+      
+      await xmpp.stop()
+    }
+  })
 
 
 menu()

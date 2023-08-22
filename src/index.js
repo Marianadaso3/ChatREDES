@@ -328,7 +328,59 @@ async function login(jid, password) {
           secondMenu()
         })
         break
-
-
+        
+      
+      default:
+        console.log('❌ Opción no válida. Por favor, elige una opción válida.')
+        secondMenu()
+    }
+  }
+  
+  // Funcion para manejar las opciones del menu de funciones
+  const handleSecondMenuOption = async(option) => {
+    switch (option) {
+      case '1':
+        //Mostar todos los contactos y su estado
+        formatContacts()
+        secondMenu()
+        break
+      case '2':
+        // Agregar un usuario a los contactos
+        rl.question('Introduce el ID del usuario que deseas agregar: ',async (contactJid) => {
+          addContact(xmpp, contactJid)
+          secondMenu()
+        })
+        break
+      case '3':
+        // Mostrar detalles de contacto de un usuario
+        rl.question('Introduce el JID del usuario del que deseas ver detalles: ', (contactJid) => {
+          const contact = contacts[contactJid + '@alumchat.xyz']
+          if (contact) {
+            console.log(`Detalles de ${contactJid}: ${contact.show || 'disponible'} (${contact.status || 'sin estado'})`)
+          } else {
+            console.log('No se encontró el usuario o no está en tu lista de contactos.')
+          }
+          secondMenu()
+        })
+        break
+      case '4':
+        // Comunicación 1 a 1 con cualquier usuario/contacto
+        rl.question('Introduce el JID del usuario con el que deseas chatear: ', (contactJid) => {
+          rl.question('Introduce el mensaje que deseas enviar: ', (message) => {
+            sendMessages(xmpp, contactJid, message)
+            secondMenu()
+          })
+        })
+        break
+      case '5':
+        // Participar en conversaciones grupales
+        console.log('1) Crear grupo')
+        console.log('2) Enviar mensaje a grupo')
+        console.log('3) Agregar usuario a grupo')
+        console.log('4) Unirse a un grupo público') // Nueva opción aquí
+        rl.question('\nElige una opción: ', (answer) => {
+          handleGroup(answer)
+        })
+        break
 
 menu()

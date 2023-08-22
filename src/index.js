@@ -254,6 +254,17 @@ const sendMessages = async (xmpp, contactJid, message) => {
   }
 }
 
+async function login(jid, password) {
+  // Nos conectamos al servidor
+  const xmpp = client({
+    service: 'xmpp://alumchat.xyz:5222',
+    domain: 'alumchat.xyz',
+    username: jid, 
+    password: password,
+    // terminal: true,
+  })
+
+
 
 
 menu()

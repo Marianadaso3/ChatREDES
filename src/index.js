@@ -559,5 +559,24 @@ async function login(jid, password) {
 
   })
 
+  // Manejo de eventos
+  xmpp.on('online', async (address) => {
+    console.log('▶', 'online as', address.toString())
+    await xmpp.send(xml('presence'))
+  })
+
+  // Si el servidor nos envia un error
+  xmpp.on('error',async (err) => {
+
+    if (err.condition === 'not-authorized') {
+      console.error('❌ Autenticación fallida. Verifica tu ID de cuenta y contraseña.')
+    } else {
+      console.error('❌', err.toString())
+    }
+    menu()
+  })
+
+
+
 
 menu()

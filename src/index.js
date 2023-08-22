@@ -416,7 +416,24 @@ async function login(jid, password) {
     }
   }
 
-
+  xmpp.on('stanza', async (stanza) => {
+    if (stanza.is('message')) {
+      
+      // Manejar invitaciones a salas de grupo
+      if (stanza.is('message') && stanza.getChild('x', 'http://jabber.org/protocol/muc#user') 
+          && stanza.getChild('x', 'http://jabber.org/protocol/muc#user').getChild('invite')) 
+      {
+        const roomJid = stanza.attrs.from
+        console.log(`💌 Has sido invitado a la sala ${roomJid}`)
+      
+        const presenceStanza = xml(
+          'presence',
+          { to: roomJid + '/' + xmpp.jid.local },
+          xml('x', { xmlns: 'http://jabber.org/protocol/muc' })
+        )
+        xmpp.send(presenceStanza)
+        console.log(`👯 Te has unido a la sala ${roomJid}`)
+      }
 
 
 menu()

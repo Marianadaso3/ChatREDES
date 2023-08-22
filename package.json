@@ -1,5 +1,5 @@
 {
-  "name": "ChatRedes",
+  "name": "proyecto1_red",
   "version": "1.0.0",
   "description": "Servidor Para XMPP",
   "main": "index.js",

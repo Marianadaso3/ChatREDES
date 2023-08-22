@@ -382,5 +382,27 @@ async function login(jid, password) {
           handleGroup(answer)
         })
         break
+        
+      case '6':
+        // Cambiar estado y show
+        for (const show in showIcon) {
+          console.log(`${show}: ${showIcon[show]}`)
+        }
+        rl.question('Introduce el show que deseas usar: ', (show) => {
+          rl.question('Introduce el mensaje de estado que deseas usar (opcional): ', (status) => {
+            cambiarEstadoUsuario(xmpp, show, status)
+            secondMenu()
+          })
+        })
+        break
+      case '7':
+        // Enviar/recibir archivos
+        rl.question('Introduce el JID del usuario al que deseas enviar un archivo: ', (contactJid) => {
+          rl.question('Introduce la ruta del archivo que deseas enviar: ', async (filePath) => {
+            await leerArchivo(xmpp,filePath,contactJid)
+            secondMenu()
+          })
+        })
+        break
 
 menu()

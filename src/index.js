@@ -439,8 +439,28 @@ async function login(jid, password) {
         const from = stanza.attrs.from
         const message = stanza.getChildText('body')
 
+        // Verificar si es un archivo
+        const isFile = message.includes('file://') 
+        if (isFile) {
+          const fileData = message.split('//')[2]
+          const extension = message.split('//')[1].split(':')[0]
+          const decodedFileData = Buffer.from(fileData, 'base64')
+          const fileName = `${from.split('@')[0]}-${Date.now()}.${extension}`
+          const directoryPath = path.join(__dirname, './recibidos');
 
+          // Crear el directorio si no existe
+          if (!fs.existsSync(directoryPath)) {
+            fs.mkdirSync(directoryPath, { recursive: true });
+          }
 
+          //guardarlo en ./recibidos
+          fs.writeFileSync(path.join(__dirname,`./recibidos/${fileName}`), decodedFileData)
+          console.log(`📃 Nuevo archivo de ${from}: ${fileName}`)
+        }else{
+
+          console.log(`📥 Nuevo mensaje de ${from}: ${message}`)
+        }
+      } 
 
 
 menu()

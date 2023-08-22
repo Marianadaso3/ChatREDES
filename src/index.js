@@ -264,6 +264,27 @@ async function login(jid, password) {
     // terminal: true,
   })
 
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
+  // debug(xmpp, true)
+
+  // Funcion para mostrar el segundo menu de funciones
+  const secondMenu = ()=> {
+
+    console.log('\n')
+    console.log('1) Mostrar todos los contactos y su estado')
+    console.log('2) Agregar un usuario a los contactos')
+    console.log('3) Mostrar detalles de contacto de un usuario')
+    console.log('4) Comunicación 1 a 1 con cualquier usuario/contacto')
+    console.log('5) Participar en conversaciones grupales')
+    console.log('6) Cambiar estado y show')
+    console.log('7) Enviar/recibir archivos')
+    console.log('8) Cerrar sesion')
+    rl.question('\nElige una opción: ',async (answer) => {
+      await handleSecondMenuOption(answer)
+    })
+  }
+  
 
 
 

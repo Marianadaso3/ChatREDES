@@ -480,6 +480,68 @@ async function login(jid, password) {
       console.log('🗸', 'Successfully logged in')
       secondMenu()
     }
+    // Manejo de la suscripcion
+    else if (stanza.is('presence')){
+      // Si es una presencia de un usuario agregar al roster
+      if (stanza.attrs.type === 'subscribe'){
+        console.log(`🤗 Solicitud de suscripcion de ${stanza.attrs.from}`)
+        xmpp.send(xml('presence', { to: stanza.attrs.from, type: 'subscribed' }))
+        console.log(`🤗 Has aceptado la solicitud de ${stanza.attrs.from}`)
+        contacts[stanza.attrs.from] = {status: '', show: '🟢Available'}
+      }
+      // Si es una presencia de un usuario aceptando la suscripcion
+      else if (stanza.attrs.type === 'subscribed'){
+        console.log(`🤗 El usuario ${stanza.attrs.from} ha aceptado tu solicitud de suscripcion`)
+      }
+      else if(!stanza.attrs.type){
+        const contactJid = stanza.attrs.from.split('/')[0]
+        if (contactJid !== xmpp.jid.bare().toString()) {  // Comprueba si el JID del contacto es diferente al tuyo
+          console.log(`El usuario ${contactJid} esta en tu lista de contactos`)
+          const status = stanza.getChild('status')?.getText()
+          const show = stanza.getChild('show')?.getText()
+          if (status) {
+            contacts[contactJid] = {...contacts[contactJid],status}
+          }else{
+            contacts[contactJid] = {...contacts[contactJid],status: ''}
+          }
+          if (show) {
+            contacts[contactJid] = {...contacts[contactJid],show: showIcon[show]}
+          }else{
+            contacts[contactJid] = {...contacts[contactJid],show: '🟢Available'}
+          }
+          //contacts[contactJid] = {status, show}
+        }
+      }
+      // Si es una presencia de un grupo agregar al roster del grupo
+      if (stanza.getChild('x', 'http://jabber.org/protocol/muc#user')) {
+        const local = {}
+        const groupJid = stanza.attrs.from.split('/')[0]
+        const groupRosterItems = stanza.getChild('x').getChildren('item')
+        
+        groupRosterItems.forEach((item) => {
+          const contactJid = item.attrs.jid.split('/')[0]
+          const status = ""
+          const show = "🟢Available"
+          console.log(`${contactJid} se ha unido al grupo ${groupJid}`)
+          if (contactJid !== xmpp.jid.bare().toString() && !(contactJid in contacts)) { 
+            contacts[contactJid] = {status, show}
+          }
+          if (!(contactJid in local)){
+
+            local[contactJid] = {status, show}
+          }
+        })
+
+        if (!(groupJid in groupRoster)){
+          groupRoster[groupJid] = local
+        }else{
+          groupRoster[groupJid] = {...groupRoster[groupJid],...local}
+        }
+        
+      }
+    }
+
+
 
 
 menu()

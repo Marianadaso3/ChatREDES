@@ -284,7 +284,27 @@ async function login(jid, password) {
       await handleSecondMenuOption(answer)
     })
   }
-  
+  // Funcion para mostrar el menu de funciones de grupo
+  const handleGroup = (option) => { 
+    switch (option) {
+      case '1':
+        // Crear grupo
+        rl.question('Introduce el nombre del grupo: ', (groupName) => {
+          crearRoom(xmpp,groupName)
+          secondMenu()
+        })
+        break
+      case '2':
+        // Enviar mensaje a grupo
+        rl.question('Introduce el nombre del grupo: ', (groupName) => {
+          rl.question('Introduce el mensaje que deseas enviar: ', (message) => {
+            const groupJid = `${groupName}@conference.alumchat.xyz`
+            const messageStanza = xml('message', { to: groupJid, type: 'groupchat' }, xml('body', {}, message))
+            xmpp.send(messageStanza)
+            secondMenu()
+          })
+        })
+        break
 
 
 

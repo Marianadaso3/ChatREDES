@@ -109,7 +109,24 @@ const formatContacts = async () => {
 }
 
 
-
+// Funcion para leer el archivo y enviarlo
+const leerArchivo = async (xmpp,path,toJid) => {
+  try{
+  
+    const extension = path.split('.').pop()
+    
+    const fileData = await fs.readFileSync(path)
+    const encodedFileData = Buffer.from(fileData).toString('base64')
+    const message = `file://${extension}://${encodedFileData}` // se crea el mensaje
+    
+    sendMessages(xmpp, toJid, message)
+    return
+  }
+  catch(err){
+    console.log('❌ El archivo adjuntado no existe')
+    return
+  }
+}
 
 // Funcion para manejar las opciones del menu principal de acciones
 function handleMenuOption(option) {
@@ -645,6 +662,7 @@ async function deleteAccount(jid, password) {
 
   xmpp.start().catch(() => {})
 }
+
 
 
 menu()

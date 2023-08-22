@@ -541,7 +541,23 @@ async function login(jid, password) {
       }
     }
 
+    // Para guardar el rouster
+    else if (stanza.is('iq') && stanza.attrs.type === 'result' && stanza.getChild('query', 'jabber:iq:roster')) {
+      const rosterItems = stanza.getChild('query').getChildren('item')
+      rosterItems.forEach((item) => {
+        const contactJid = item.attrs.jid
+        const status = ""
+        const show = "⚪Offline"
+        if (contactJid !== xmpp.jid.bare().toString() && !(contactJid in contacts)) { 
+          contacts[contactJid] = {status, show}
+        }
+      })
+    }
+  
+  
 
+
+  })
 
 
 menu()

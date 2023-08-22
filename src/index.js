@@ -461,6 +461,19 @@ async function login(jid, password) {
           console.log(`📥 Nuevo mensaje de ${from}: ${message}`)
         }
       } 
+      // Manejar mensajes de grupo
+      else if (stanza.is('message') && stanza.attrs.type === 'groupchat') {
+        const from = stanza.attrs.from
+        const roomJid = from.split('/')[0]  // Obtiene el JID de la sala sin el recurso (nombre del usuario)
+        const senderNickname = from.split('/')[1]  // Obtiene el nickname del usuario que envió el mensaje
+        const body = stanza.getChildText('body')
+        
+        if (body) {  // Verifica si realmente hay un cuerpo en el mensaje
+            console.log(`👯 Mensaje de ${senderNickname} en sala ${roomJid}:📥 ${body}`)
+        }
+    }
+    }
+
 
 
 menu()

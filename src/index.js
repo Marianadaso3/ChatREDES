@@ -111,4 +111,137 @@ const formatContacts = async () => {
 
 
 
+// Funcion para manejar las opciones del menu principal de acciones
+function handleMenuOption(option) {
+  switch (option) {
+    case '1':
+      rl.question('Introduce el nuevo ID para la cuenta: ', (jid) => {
+        rl.question('Introduce la contraseña para la cuenta: ', (password) => {
+          register(jid, password)
+        })
+      })
+      break
+    case '2':
+      
+      rl.question('Introduce el ID para la cuenta: ', (jid) => {
+        rl.question('Introduce la contraseña para la cuenta: ', (password) => {
+
+          login(jid, password)
+
+        })
+      })
+      break
+      
+    case '3':
+      rl.question('Introduce el ID para la cuenta: ', (jid) => {
+        rl.question('Introduce la contraseña para la cuenta: ', (password) => {
+          deleteAccount(jid, password)
+        })
+      })
+      break
+    case '4':
+      console.log('Saliendo del programa...')
+      rl.close()
+      process.exit(0)
+
+    default:
+      console.log('Opción no válida. Por favor, elige una opción válida.')
+      menu()
+  }
+}
+
+// Funcion para registrar una nueva cuenta
+async function register(username, password) {
+  
+  // Se usa un socket de net para registrar la cuenta
+  const client = new net.Socket()
+  client.connect(5222, 'alumchat.xyz', function() {
+    console.log('Connected')
+    client.write('<stream:stream to="' + 'alumchat.xyz' + '" xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" version="1.0">')
+  })
+
+  // Se verifica el usuario y se envia el registro
+  client.on('data', function(data) {
+    console.log('Received: ' + data)
+    if (data.toString().includes('<stream:features>')) {
+      client.write('<iq type="set" id="reg1"><query xmlns="jabber:iq:register"><username>' + username + '</username><password>' + password + '</password></query></iq>')
+    } else if (data.toString().includes('iq type="result" id="reg1"')) {
+      // El registro fue exitoso, procede con el inicio de sesión
+      registerState.successfulRegistration = true
+      client.destroy()
+    } else if (data.toString().includes('<error code"409" type="cancel"><conflict xmlns="urn:ietf:params:xml:ns:xmpp-stanzas"/>')) {
+      // El usuario ya existe
+      console.log('❌ El usuario ya existe, por favor elige un nombre de usuario diferente.')
+      client.destroy()
+
+    }
+  })
+
+  // Se cierra la conexion e inicia sesion si el registro fue exitoso
+  client.on('close', function() {
+    console.log('Connection closed')
+    if (registerState.successfulRegistration) {
+      console.log('Registro exitoso, iniciando sesión...\n\n')
+      login(username, password)
+    }
+    else {
+      // Si el registro no fue existoso, mostramos el menu de usuario
+      menu()
+    }
+  })
+}
+
+// Funcion para crear una sala de chat
+const crearRoom = async (xmpp, roomName) => {
+  try {
+    // Crear sala de chat
+    const groupJid = `${roomName}@conference.alumchat.xyz/${xmpp.jid.local}`
+    const groupStanza = xml('presence', { to: groupJid }, xml('x', { xmlns: 'http://jabber.org/protocol/muc' }))
+    xmpp.send(groupStanza)
+
+    // Configurar sala de chat como abierta
+    const configRequest = xml('iq', { to: groupJid, type: 'set' }, 
+      xml('query', { xmlns: 'http://jabber.org/protocol/muc#owner' }, 
+        xml('x', { xmlns: 'jabber:x:data', type: 'submit' }, 
+          xml('field', { var: 'muc#roomconfig_publicroom', type: 'boolean' }, 
+            xml('value', {}, '1')
+          )
+        )
+      )
+    )
+
+    xmpp.send(configRequest)
+    console.log("👯 Sala de chat creada exitosamente y configurada como abierta")
+  } catch (error) {
+    console.log(`❌ Error al crear la sala de chat: ${error.message}`)
+  }
+}
+
+// Funcion para unirse a una sala de chat
+const unirseRoom = async (xmpp, roomName) => {
+  try {
+    const groupJid = `${roomName}@conference.alumchat.xyz/${xmpp.jid.local}`
+    const groupStanza = xml('presence', { to: groupJid }, xml('x', { xmlns: 'http://jabber.org/protocol/muc' }))
+    xmpp.send(groupStanza)
+    console.log(`👯 Intentando unirse al grupo público ${roomName}`)
+  } catch (error) {
+    console.log(`❌ Error al unirse a la sala de chat: ${error.message}`)
+  }
+}
+
+// Funcion para agregar un contacto con una stanza de presence
+const addContact = async (xmpp, contactJid) => {
+  try {
+    const presenceStanza =  xml('presence', { to: `${contactJid}@alumchat.xyz`, type: 'subscribe' })
+    await xmpp.send(presenceStanza)
+    console.log('📨 Solicitud de contacto enviada a', contactJid)
+  } catch (error) {
+    console.log('❌ Error al agregar contacto', error)
+  }
+}
+
+
+
+
+
 menu()

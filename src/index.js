@@ -240,7 +240,19 @@ const addContact = async (xmpp, contactJid) => {
   }
 }
 
-
+// Funcion para enviar mensajes
+const sendMessages = async (xmpp, contactJid, message) => {
+  try {
+    const messageStanza = xml(
+      'message',
+      { type: 'chat', to: contactJid + '@alumchat.xyz' },
+      xml('body', {}, message),
+    )
+    xmpp.send(messageStanza)
+  } catch (error) {
+    console.log('❌ Error al enviar mensaje', error)
+  }
+}
 
 
 

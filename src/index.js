@@ -576,6 +576,16 @@ async function login(jid, password) {
     menu()
   })
 
+  // Si nos desconectamos
+  xmpp.on('offline', () => {
+    console.log('⏹', 'offline')
+    menu()
+  })
+
+  // Nos conectamos al servidor
+  xmpp.start().catch(() =>{})
+
+}
 
 
 

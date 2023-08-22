@@ -305,6 +305,29 @@ async function login(jid, password) {
           })
         })
         break
+      case '3':
+        // Agregar usuario a grupo
+        rl.question('Introduce el nombre del grupo: ', (groupName) => {
+          rl.question('Introduce el JID del usuario que deseas agregar: ', (contactJid) => {
+            const groupJid = `${groupName}@conference.alumchat.xyz`
+            const inviteStanza = xml('message', { to: groupJid },
+              xml('x', { xmlns: 'http://jabber.org/protocol/muc#user' },
+                xml('invite', { to: `${contactJid}@alumchat.xyz` })
+              )
+            )
+            xmpp.send(inviteStanza)
+            console.log(`Invitación enviada a ${contactJid} para unirse al grupo ${groupName}`)
+            secondMenu()
+          })
+        })
+        break
+      case '4':
+        // Unirse a un grupo público
+        rl.question('Introduce el nombre del grupo público al que deseas unirte: ', (groupName) => {
+          unirseRoom(xmpp,groupName)
+          secondMenu()
+        })
+        break
 
 
 

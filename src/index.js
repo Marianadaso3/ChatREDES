@@ -633,6 +633,18 @@ async function deleteAccount(jid, password) {
       await xmpp.stop()
     }
   })
+  // Nos desconectamos y volvemos al menu 
+  xmpp.on('offline', () => {
+    xmpp.stop()
+    console.log('⏹', 'offline')
+
+    menu()
+
+
+  })
+
+  xmpp.start().catch(() => {})
+}
 
 
 menu()

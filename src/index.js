@@ -473,7 +473,13 @@ async function login(jid, password) {
         }
     }
     }
-
+    // Manejo del loggin
+    else if (stanza.is('presence') && stanza.attrs.from === xmpp.jid.toString() && stanza.attrs.type !== 'unavailable') {
+      // Obtener el roster del usuario
+      getRoster(xmpp,jid)
+      console.log('🗸', 'Successfully logged in')
+      secondMenu()
+    }
 
 
 menu()

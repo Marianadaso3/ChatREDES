@@ -56,7 +56,7 @@ function menu() {
 ### Status change
 
 ```javascript
-const changeState = (xmpp, status, showMessage) => {
+const cambioEst = (xmpp, status, showMessage) => {
   // Código para cambiar el estado del usuario
 }
 ```
@@ -64,9 +64,9 @@ const changeState = (xmpp, status, showMessage) => {
 ### Contact Management
 
 ```javascript
-const getRoster = (xmpp,jid) => { ... }
-const cleanContacts = () => { ... }
-const formatContacts = async () => { ... }
+const obtLista = (xmpp,jid) => { ... }
+const limpContac = (contacts) => { ... }
+const contacForm = async () => { ... }
 ```
 
 Parameters:
@@ -76,7 +76,7 @@ Parameters:
 ### Read and Send Files
 
 ```javascript
-const reedFile = async (xmpp,path,toJid) => { ... }
+const leerArchivo = async (xmpp,path,toJid) => { ... }
 ```
 
 Parameters:
@@ -87,7 +87,7 @@ Parameters:
 ### Menu Options
 
 ```javascript
-function casesMenu(option) { ... }
+function manejoOp(option) { ... }
 ```
 ### User Registration
 
@@ -97,8 +97,8 @@ async function register(username, password) { ... }
 ### Creation and Joining Rooms
 
 ```javascript
-const creatRoom = async (xmpp, roomName) => { ... }
-const joinRoom = async (xmpp, roomName) => { ... }
+const crearRoom = async (xmpp, roomName) => { ... }
+const unirseRoom = async (xmpp, roomName) => { ... }
 ```
 Parameters:
 - xmpp: XMPP client connected to the server
@@ -107,7 +107,7 @@ Parameters:
 ### Send messages
 
 ```javascript
-const sendMessages = async (xmpp, contactJid, message) => { ... }
+const mandMensa = async (xmpp, contactJid, message) => { ... }
 ```
 
 Parameters:
@@ -118,7 +118,7 @@ Parameters:
 ### Delete account
 
 ```javascript
-async function deleteAccount(jid, password) { ... }
+async function eliminarCuent(jid, password) { ... }
 ```
 
 Parameters:
@@ -130,17 +130,41 @@ Parameters:
 #### Configure connection to the server
 
 ```javascript
-async function login(jid, password) {
-  // Nos conectamos al servidor
-  const xmpp = client({
-    service: 'xmpp://alumchat.xyz:5222',
-    domain: 'alumchat.xyz',
-    username: jid,
-    password: password,
-    // terminal: true,
-  })
+async function regi(username, password) {
+  const xmppServer = 'alumchat.xyz';
+  const xmppPort = 5222;
 
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+  const client = new net.Socket();
+
+  client.connect(xmppPort, xmppServer, () => {
+    console.log('Connected');
+    const streamOpening = '<stream:stream to="' + xmppServer + '" xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" version="1.0">';
+    client.write(streamOpening);
+  });
+
+  client.on('data', (data) => {
+    console.log('Received: ' + data);
+
+    if (data.toString().includes('<stream:features>')) {
+      const registrationQuery = `<iq type="set" id="reg1"><query xmlns="jabber:iq:regi"><username>${username}</username><password>${password}</password></query></iq>`;
+      client.write(registrationQuery);
+    } else if (data.toString().includes('iq type="result" id="reg1"')) {
+      console.log('Registro exitoso, iniciando sesión...\n\n');
+      client.destroy();
+      login(username, password);
+    } else if (data.toString().includes('<error code"409" type="cancel"><conflict xmlns="urn:ietf:params:xml:ns:xmpp-stanzas"/>')) {
+      console.log('[ERROR] El usuario ya existe, por favor elige un nombre de usuario diferente.');
+      client.destroy();
+      menu();
+    }
+  });
+
+  client.on('close', () => {
+    console.log('Connection closed');
+    if (!regiState.successfulRegistration) {
+      menu();
+    }
+  });
 }
 ```
 
